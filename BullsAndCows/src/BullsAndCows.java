@@ -1,7 +1,8 @@
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
-public class BullsAndCows{
+public class BullsAndCows {
     final static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
 
@@ -32,23 +33,51 @@ public class BullsAndCows{
 
     }
 
-    static String generateSecretCode(){
-        System.out.println("Please, enter the secret code's length:");
-        int number = scanner.nextInt();
+    static String generateSecretCode() {
         int out;
+        String validSymbols = "0123456789abcdefghijklmnopqrstuvwxyz";
         String temp;
         String num = "";
-        if (number <= 10) {
-            while (num.length() < number) {
-                out = new Random().nextInt(9);
-                temp = Integer.toString(out);
-                if (!num.contains(temp)) {
-                    num += temp;
+
+        try {
+            System.out.println("Input the length of the secret code:");
+            int number = scanner.nextInt();
+            System.out.println("Input the number of possible symbols in the code:");
+            int symbols = scanner.nextInt();
+
+            if (!(symbols < number) && !(number == 0)){
+                validSymbols = validSymbols.substring(0, symbols);
+                while (num.length() < number) {
+                    out = new Random().nextInt(symbols);
+                    temp = validSymbols.substring(out, out + 1);
+                    if (!num.contains(temp)) {
+                        num += temp;
+                    }
                 }
+                System.out.print("The secret is prepared: ");
+                for (int i = 0; i < number; i++) {
+                    System.out.print("*");
+                }
+                if (symbols > 10){
+                    System.out.printf(" (0-9, a-%c)\n", validSymbols.charAt(validSymbols.length()-1));
+                }
+                else if (symbols <= 10) {
+                    System.out.printf(" (0-%c)\n", validSymbols.charAt(validSymbols.length() - 1));
+                }
+            } else {
+                System.out.printf("Error: it's not possible to generate a code of length %d with %d unique symbols\n", number, symbols);
+                num = "-1";
             }
+        } catch (InputMismatchException e){
+            System.out.println("Error: Not a valid number");
+            num = "-1";
         }
-        else {
-            System.out.println("Error: can't generate a secret number with a length of 11 because there aren't enough unique digits.");
+        catch (StringIndexOutOfBoundsException e) {
+            System.out.println("Error: maximum number of possible symbols in the code is 36 (0-9, a-z).");
+            num = "-1";
+        }
+        catch (Exception e){
+            System.out.println("Exception: " + e.getClass().getName());
             num = "-1";
         }
         return num;
